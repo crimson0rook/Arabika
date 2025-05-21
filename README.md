@@ -49,7 +49,7 @@ sudo apt install zenity libfuse2
    ```
 
 ### 2. عبر Gear Lever:
-1. افتح تطبيق [Gear Lever](https://github.com/itsakiak/gearlever)
+1. افتح تطبيق [Gear Lever](https://github.com/mijorus/gearlever)
 2. أضف ملف `Arabika-x86_64.AppImage` إلى القائمة
 3. اضغط لتشغيله مباشرة من الواجهة الرسومية
 
