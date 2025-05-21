@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Arabika
+Exec=AppRun
+Icon=arabika
+Type=Application
+Categories=Utility;
+Terminal=false
+Comment=واجهة لتغيير الخط العربي في لينكس

@@ -1,0 +1,69 @@
+#!/bin/bash
+#Author: crimson0rook @ github
+
+
+CONFIG_DIR="$HOME/.config/fontconfig"
+CONFIG_FILE="$CONFIG_DIR/fonts.conf"
+
+mkdir -p "$CONFIG_DIR"
+
+zenity --question --title="فلترة الخطوط" \
+  --text="اختر طريقة عرض الخطوط:" \
+  --ok-label="الخطوط العربية فقط" --cancel-label="كل الخطوط"
+
+if [[ $? -eq 0 ]]; then
+  show_arabic_only=1
+else
+  show_arabic_only=0
+fi
+
+if [[ $show_arabic_only -eq 1 ]]; then
+  fonts_raw=$(fc-list :lang=ar | cut -d: -f2)
+else
+  fonts_raw=$(fc-list | cut -d: -f2)
+fi
+
+fonts_clean=$(echo "$fonts_raw" | cut -d, -f1 | sed 's/^[ \t]*//;s/[ \t]*$//')
+
+fonts=$(echo "$fonts_clean" | \
+  grep -v '^$' | \
+  grep -E '.{3,}' | \
+  grep -v '^[^a-zA-Z0-9]' | \
+  sort -u)
+
+if [[ -z "$fonts" ]]; then
+  zenity --error --title="خطأ" --text="لا توجد خطوط."
+  exit 1
+fi
+
+font_choices=$(echo "$fonts" | awk '{print "\"" $0 "\"", "FALSE"}')
+
+selected_font=$(eval zenity --list \
+  --title="اختر خط" \
+  --text="اختر "\
+  --radiolist --column="اختر " --column="الاسم" \
+  --width=600 --height=400 \
+  $font_choices)
+
+if [[ -z "$selected_font" ]]; then
+  zenity --warning --title="تحذير" --text="لم تختر أي خط، جارٍ إغلاق التطبيق."
+  exit 1
+fi
+
+cat > "$CONFIG_FILE" <<EOL
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+    <match>
+        <test name="lang" compare="contains">
+            <string>ar</string>
+        </test>
+        <edit name="family" mode="assign" binding="strong">
+            <string>$selected_font</string>
+        </edit>
+    </match>
+</fontconfig>
+EOL
+
+zenity --info --title="غيرت الخط" --text="غيرت الخط العربي إلى: \"$selected_font\""
+
