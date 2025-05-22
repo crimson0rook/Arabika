@@ -77,4 +77,3 @@ cat > "$CONFIG_FILE" <<EOL
 EOL
 
 zenity --info --title="غيرت الخط" --text="غيرت الخط العربي إلى: \"$selected_font\""
-
