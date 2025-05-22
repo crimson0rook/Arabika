@@ -1,6 +1,5 @@
 #!/bin/bash
-#Author: crimson0rook @ github
-
+# Author: crimson0rook @ github
 
 CONFIG_DIR="$HOME/.config/fontconfig"
 CONFIG_FILE="$CONFIG_DIR/fonts.conf"
@@ -38,39 +37,77 @@ fi
 
 font_choices=$(echo "$fonts" | awk '{print "\"" $0 "\"", "FALSE"}')
 
-selected_font=$(eval zenity --list \
+selected_arabic_font=$(eval zenity --list \
   --title="اختر خط" \
-  --text="اختر "\
+  --text="اختر " \
   --radiolist --column="اختر " --column="الاسم" \
   --width=600 --height=400 \
   $font_choices)
 
-if [[ -z "$selected_font" ]]; then
+if [[ -z "$selected_arabic_font" ]]; then
   zenity --warning --title="تحذير" --text="لم تختر أي خط، جارٍ إغلاق التطبيق."
   exit 1
+fi
+
+zenity --question --title="خط اللغات الأخرى" \
+  --text="هل تريد استخدام نفس الخط للنصوص غير العربية؟" \
+  --ok-label="نعم، نفس الخط" --cancel-label="لا، اختر خطًا آخر"
+
+if [[ $? -eq 0 ]]; then
+  selected_latin_font="$selected_arabic_font"
+else
+  fonts_raw_all=$(fc-list | cut -d: -f2)
+  fonts_clean_all=$(echo "$fonts_raw_all" | cut -d, -f1 | sed 's/^[ \t]*//;s/[ \t]*$//')
+  fonts_all=$(echo "$fonts_clean_all" | grep -v '^$' | grep -E '.{3,}' | grep -v '^[^a-zA-Z0-9]' | sort -u)
+  font_choices_all=$(echo "$fonts_all" | awk '{print "\"" $0 "\"", "FALSE"}')
+  
+  selected_latin_font=$(eval zenity --list \
+    --title="اختر خط" \
+    --text="اختر " \
+    --radiolist --column="اختر " --column="الاسم" \
+    --width=600 --height=400 \
+    $font_choices_all)
+
+  if [[ -z "$selected_latin_font" ]]; then
+    zenity --warning --title="تحذير" --text="لم تختر أي خط، جارٍ إغلاق التطبيق."
+    exit 1
+  fi
 fi
 
 cat > "$CONFIG_FILE" <<EOL
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
 <fontconfig>
-    <match>
-        <test name="lang" compare="contains">
-            <string>ar</string>
-        </test>
-        <edit name="family" mode="assign" binding="strong">
-            <string>$selected_font</string>
-        </edit>
-    </match>
-    <match target="pattern">
-        <test name="family">
-            <string>sans-serif</string>
-        </test>
-        <edit name="family" mode="assign" binding="strong">
-            <string>$selected_font</string>
-        </edit>
-    </match>
+  <match>
+    <test name="family">
+      <string>sans-serif</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>$selected_arabic_font</string>
+      <string>$selected_latin_font</string>
+    </edit>
+  </match>
+
+  <match>
+    <test name="family">
+      <string>serif</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>$selected_arabic_font</string>
+      <string>$selected_latin_font</string>
+    </edit>
+  </match>
+
+  <match>
+    <test name="family">
+      <string>sans</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>$selected_arabic_font</string>
+      <string>$selected_latin_font</string>
+    </edit>
+  </match>
 </fontconfig>
 EOL
 
-zenity --info --title="غيرت الخط" --text="غيرت الخط العربي إلى: \"$selected_font\""
+zenity --info --title="تم تغيير الخط" --text="تم تغيير الخط العربي إلى:\n\"$selected_arabic_font\"\nوخط اللغات الأخرى إلى:\n\"$selected_latin_font\""
