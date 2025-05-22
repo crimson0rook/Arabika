@@ -83,8 +83,8 @@ cat > "$CONFIG_FILE" <<EOL
       <string>sans-serif</string>
     </test>
     <edit name="family" mode="prepend" binding="strong">
-      <string>$selected_arabic_font</string>
       <string>$selected_latin_font</string>
+      <string>$selected_arabic_font</string>
     </edit>
   </match>
 
@@ -93,8 +93,8 @@ cat > "$CONFIG_FILE" <<EOL
       <string>serif</string>
     </test>
     <edit name="family" mode="prepend" binding="strong">
-      <string>$selected_arabic_font</string>
       <string>$selected_latin_font</string>
+      <string>$selected_arabic_font</string>
     </edit>
   </match>
 
@@ -103,8 +103,8 @@ cat > "$CONFIG_FILE" <<EOL
       <string>sans</string>
     </test>
     <edit name="family" mode="prepend" binding="strong">
-      <string>$selected_arabic_font</string>
       <string>$selected_latin_font</string>
+      <string>$selected_arabic_font</string>
     </edit>
   </match>
 </fontconfig>
