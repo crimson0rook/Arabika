@@ -50,7 +50,7 @@ if [[ -z "$selected_arabic_font" ]]; then
 fi
 
 zenity --question --title="خط اللغات الأخرى" \
-  --text="هل تريد استخدام نفس الخط للنصوص غير العربية؟" \
+  --text="هل تريد استخدام نفس الخط ($selected_arabic_font)\n للنصوص غير العربية؟" \
   --ok-label="نعم، نفس الخط" --cancel-label="لا، اختر خطًا آخر"
 
 if [[ $? -eq 0 ]]; then
